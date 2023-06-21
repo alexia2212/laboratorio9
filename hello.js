@@ -1,18 +1,17 @@
 const moves = document.getElementById("moves-count");
-const timeValue = document.getElementById("time");
 const startButton = document.getElementById("start");
-const stopButton = document.getElementById("stop");
+const cambiarButton = document.getElementById("cambiarturno");
+const retrocedeButton = document.getElementById("retroceder");
+const avanzarButton = document.getElementById("avanzar");
+
+const page = document.getElementById("ingresa");
 const gameContainer = document.querySelector(".game-container");
 const result = document.getElementById("result");
 const controls = document.querySelector(".controls-container");
+let ingresa;
+let pokemon;
 
-let cards;
-let interval;
-let firstCard = false;
-let secondCard = false;
-
-//Items array
-
+//Pokemones items
 const items = [
     { name: "bullbasaur", image: "Bulbasaur.png" },
     { name: "chansey", image: "Chansey.png" },
@@ -23,121 +22,99 @@ const items = [
     { name: "squirtle", image: "Squirtle.png" },
 
 ];
-
-//Initial Time
-let seconds = 0,
-    minutes = 0;
-//Initial moves and win count
-let movesCount = 0,
-    winCount = 0;
-
-//For timer
-const timeGenerator = () => {
-    seconds += 1;
-    //minutes logic
-    if (seconds >= 60) {
-        minutes += 1;
-        seconds = 0;
-    }
-    //format time before displaying
-    let secondsValue = seconds < 10 ? `0${seconds}` : seconds;
-    let minutesValue = minutes < 10 ? `0${minutes}` : minutes;
-    timeValue.innerHTML = `<span>Time:</span>${minutesValue}:${secondsValue}`;
-};
-
-//For calculating moves
+//Calcular movimientos
 const movesCounter = () => {
     movesCount += 1;
     moves.innerHTML = `<span>Moves:</span>${movesCount}`;
 };
+const moveRight = () => {
+    // Incrementa la posición horizontal
+    posX += 6;
 
-//Pick random objects from the items array
+    // Actualiza la posición del personaje en la pantalla
+    character.style.left = posX + 'px';
+
+    // Incrementa el contador de movimientos
+    movesCounter();
+};
+const addButton = document.getElementById('addButton');
+addButton.addEventListener('click', addCharacter);
+
+function addCharacter() {
+    const colorInput = document.getElementById('colorInput');
+    const nameInput = document.getElementById('nameInput');
+
+    const color = colorInput.value;
+    const name = nameInput.value;
+
+    // Crea un nuevo elemento div para representar el personaje
+    const characterDiv = document.createElement('div');
+    characterDiv.className = 'character';
+
+    // Establece el estilo de fondo del personaje usando la imagen ingresada
+    characterDiv.style.backgroundImage = `url('${color}.jpg')`;
+
+    // Agrega el nombre del personaje como texto dentro del div
+    const characterName = document.createElement('span');
+
+    characterName.textContent = name;
+    characterDiv.appendChild(characterName);
+
+    // Agrega el personaje al contenedor
+    const container = document.getElementById('container');
+    container.appendChild(characterDiv);
+
+    // Limpia los campos de entrada después de agregar el personaje
+    colorInput.value = '';
+    nameInput.value = '';
+}
+
 const generateRandom = (size = 4) => {
     //temporary array
     let tempArray = [...items];
     //initializes cardValues array
-    let cardValues = [];
+    let valoresPokemo = [];
     //size should be double (4*4 matrix)/2 since pairs of objects would exist
     size = (size * size) / 2;
     //Random object selection
     for (let i = 0; i < size; i++) {
         const randomIndex = Math.floor(Math.random() * tempArray.length);
-        cardValues.push(tempArray[randomIndex]);
+        valoresPokemo.push(tempArray[randomIndex]);
         //once selected remove the object from temp array
         tempArray.splice(randomIndex, 1);
     }
-    return cardValues;
+    return valoresPokemo;
 };
 
-const matrixGenerator = (cardValues, size = 4) => {
+const matrixGenerator = (valoresPokemo, size = 4) => {
     gameContainer.innerHTML = "";
-    cardValues = [...cardValues, ...cardValues];
+    valoresPokemo = [...valoresPokemo, ...valoresPokemo];
     //simple shuffle
-    cardValues.sort(() => Math.random() - 0.5);
+    valoresPokemo.sort(() => Math.random() - 0.5);
     for (let i = 0; i < size * size; i++) {
-        /*
-            Create Cards
-            before => front side (contains question mark)
-            after => back side (contains actual image);
-            data-card-values is a custom attribute which stores the names of the cards to match later
-          */
+
         gameContainer.innerHTML += `
-     <div class="card-container" data-card-value="${cardValues[i].name}">
-        <div class="card-before">?</div>
-        <div class="card-after">
-        <img src="${cardValues[i].image}" class="image"/></div>
+     <div class="pokemon-container" data-pokemon-value="${valoresPokemo[i].name}">
+        <div class="pokemon">?</div>
+        <div class="pokemon-after">
+        <img src="${valoresPokemo[i].image}" class="image"/></div>
      </div>
      `;
     }
     //Grid
     gameContainer.style.gridTemplateColumns = `repeat(${size},auto)`;
 
-    //Cards
-    cards = document.querySelectorAll(".card-container");
-    cards.forEach((card) => {
-        card.addEventListener("click", () => {
-            //If selected card is not matched yet then only run (i.e already matched card when clicked would be ignored)
-            if (!card.classList.contains("matched")) {
-                //flip the cliked card
-                card.classList.add("flipped");
-                //if it is the firstcard (!firstCard since firstCard is initially false)
-                if (!firstCard) {
-                    //so current card will become firstCard
-                    firstCard = card;
-                    //current cards value becomes firstCardValue
-                    firstCardValue = card.getAttribute("data-card-value");
-                } else {
-                    //increment moves since user selected second card
-                    movesCounter();
-                    //secondCard and value
-                    secondCard = card;
-                    let secondCardValue = card.getAttribute("data-card-value");
-                    if (firstCardValue == secondCardValue) {
-                        //if both cards match add matched class so these cards would beignored next time
-                        firstCard.classList.add("matched");
-                        secondCard.classList.add("matched");
-                        //set firstCard to false since next card would be first now
-                        firstCard = false;
-                        //winCount increment as user found a correct match
-                        winCount += 1;
-                        //check if winCount ==half of cardValues
-                        if (winCount == Math.floor(cardValues.length / 2)) {
-                            result.innerHTML = `<h2>You Won</h2>
-            <h4>Moves: ${movesCount}</h4>`;
-                            stopGame();
-                        }
-                    } else {
-                        //if the cards dont match
-                        //flip the cards back to normal
-                        let [tempFirst, tempSecond] = [firstCard, secondCard];
-                        firstCard = false;
-                        secondCard = false;
-                        let delay = setTimeout(() => {
-                            tempFirst.classList.remove("flipped");
-                            tempSecond.classList.remove("flipped");
-                        }, 900);
-                    }
-                }
+    //pokemones
+
+    pokemones = document.querySelectorAll(".pokemon-container");
+    pokemones.forEach((poke) => {
+        poke.addEventListener("click", () => {
+            if (!poke.classList.contains("matched")) {
+                movesCounter();
+                moveRight();
+            } else {
+                moveRight();
+                    //segundo pokemon
             }
         });
     });
@@ -146,35 +123,22 @@ const matrixGenerator = (cardValues, size = 4) => {
 //Start game
 startButton.addEventListener("click", () => {
     movesCount = 0;
-    seconds = 0;
-    minutes = 0;
+
     //controls amd buttons visibility
     controls.classList.add("hide");
-    stopButton.classList.remove("hide");
     startButton.classList.add("hide");
-    //Start timer
-    interval = setInterval(timeGenerator, 1000);
+
     //initial moves
     moves.innerHTML = `<span>Moves:</span> ${movesCount}`;
     initializer();
 });
 
-//Stop game
-stopButton.addEventListener(
-    "click",
-    (stopGame = () => {
-        controls.classList.remove("hide");
-        stopButton.classList.add("hide");
-        startButton.classList.remove("hide");
-        clearInterval(interval);
-    })
-);
 
 //Initialize values and func calls
 const initializer = () => {
     result.innerText = "";
     winCount = 0;
-    let cardValues = generateRandom();
-    console.log(cardValues);
-    matrixGenerator(cardValues);
+    let pokemon = getSelection(pokemones);
+    console.log(pokemones);
+    matrixGenerator(pokemon);
 };

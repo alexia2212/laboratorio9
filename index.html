@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KE PERSONAJES</title>
@@ -9,6 +9,7 @@
 </head>
 <body>
 <h3>Juego de personajes movedizos</h3>
+
 <form>
     <label for="nropersonaje">Ingrese el numero de personaje:</label>
     <input type="number" id="nropersonaje" name="personaje" min="3" max="5" required>
@@ -26,20 +27,54 @@
             <div id="time"></div>
         </div>
         <div class="game-container"></div>
-        <button id="stop" type="submit" class="btn btn-primary">Ingresar Personajes</button>
-    </div>
+
+        <button id="ingresa" type="submit" class="btn btn-primary">Ingresar Personajes</button>
+
+     </div>
 
     <div class="controls-container">
         <p id="result"></p>
         <button id="start" type="submit" class="btn btn-primary">Iniciar Juego</button>
     </div>
+<br>
 
 </form>
+
+
+<form>
+    <div id="container">
+        <input type="text" id="colorInput" placeholder="Ingrese un color" required>
+        <input type="text" id="nameInput" placeholder="Ingrese un nombre" required>
+        <button id="addButton">Agregar</button>
+    </div>
+    <button id="cambiarturno" type="submit" class="btn btn-success">Cambiar Turno</button>
+    <button id="retroceder" type="submit" class="btn btn-success">Retroceder Personajes</button>
+    <button id="avanzar" type="submit" class="btn btn-success">Avanzar Personajes</button>
+
+</form>
+
 <br>
 
 
 <!-- Script -->
 <script src="hello.js"></script>
+
+
+<script>
+    for(imagen of document.querySelectorAll('#player>img') ){
+        imagen.addEventListener('click', clickImagen);
+
+    }
+
+    function clickImagen(){
+        for(imagen of document.querySelectorAll('img.select')){
+            imagen.classList.remove('select');
+            this.classList.add('noSelect');
+        }
+        this.classList.remove('noSelect');
+        this.classList.add('select');
+    }
+</script>
 
 </body>
 </html>
