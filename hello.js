@@ -5,25 +5,23 @@ const stopButton = document.getElementById("stop");
 const gameContainer = document.querySelector(".game-container");
 const result = document.getElementById("result");
 const controls = document.querySelector(".controls-container");
+
 let cards;
 let interval;
 let firstCard = false;
 let secondCard = false;
 
 //Items array
+
 const items = [
-    { name: "bee", image: "Abra.png" },
-    { name: "crocodile", image: "Aerodactyl.png" },
-    { name: "macaw", image: "Articuno.png" },
-    { name: "gorilla", image: "Butterfree.png" },
-    { name: "tiger", image: "Charizard.png" },
-    { name: "monkey", image: "Charmander.png" },
-    { name: "chameleon", image: "Caterpie.png" },
-    { name: "piranha", image: "Blastoise.png" },
-    { name: "anaconda", image: "Bellsprout.png" },
-    { name: "sloth", image: "Arbok.png" },
-    { name: "cockatoo", image: "Chansey.png" },
-    { name: "toucan", image: "Beedrill.png" },
+    { name: "bullbasaur", image: "Bulbasaur.png" },
+    { name: "chansey", image: "Chansey.png" },
+    { name: "charmander", image: "Charmander.png" },
+    { name: "cubone", image: "Cubone.png" },
+    { name: "meta", image: "meta.png" },
+    { name: "robot", image: "robot.png" },
+    { name: "squirtle", image: "Squirtle.png" },
+
 ];
 
 //Initial Time
